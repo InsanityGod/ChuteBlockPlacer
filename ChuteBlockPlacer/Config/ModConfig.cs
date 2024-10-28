@@ -11,6 +11,6 @@ namespace ChuteBlockPlacer.Config
         /// <summary>
         /// Whether this mod can place any block or only blocks like sand (and soil if enabled)
         /// </summary>
-        public bool UnstableFallingOnly { get; set; }
+        public bool UnstableFallingOnly { get; set; } = true;
     }
 }
