@@ -1,0 +1,36 @@
+{
+  "code": "chuteblockplacer",
+  "class": "ChuteBlockPlacerBlock",
+  "entityclass": "PlacerItemFlow",
+  "attributes": {
+    "item-flowrate": 1,
+    "inventoryClassName": "chuteblockplacer",
+    "quantitySlots": 1
+  },
+  "creativeinventory": {
+    "general": [ "*" ],
+    "mechanics": [ "*" ]
+  },
+  "blockmaterial": "Metal",
+  "shape": {
+    "base": "game:block/metal/hopperh",
+    "rotateZ": 180
+  },
+  "textures": {
+    "all": {
+      "base": "game:block/metal/sheet/copper1"
+    }
+  },
+  "sidesolid": {
+    "all": false
+  },
+  "sideopaque": {
+    "all": false
+  },
+  "sounds": {
+    "place": "game:block/chute",
+    "break": "game:block/chute",
+    "hit": "game:block/chute",
+    "walk": "game:walk/stone"
+  }
+}

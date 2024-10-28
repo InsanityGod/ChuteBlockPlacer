@@ -1,0 +1,32 @@
+[
+  {
+    "ingredientPattern": "H",
+    "ingredients": {
+      "H": {
+        "type": "block",
+        "code": "game:hopper"
+      }
+    },
+    "width": 1,
+    "height": 1,
+    "output": {
+      "type": "block",
+      "code": "chuteblockplacer"
+    }
+  },
+  {
+    "ingredientPattern": "H",
+    "ingredients": {
+      "H": {
+        "type": "block",
+        "code": "chuteblockplacer"
+      }
+    },
+    "width": 1,
+    "height": 1,
+    "output": {
+      "type": "block",
+      "code": "game:hopper"
+    }
+  }
+]

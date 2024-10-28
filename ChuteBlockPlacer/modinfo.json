@@ -1,0 +1,13 @@
+{
+  "type": "code",
+  "modid": "chuteblockplacer",
+  "name": "Chute Block Placer",
+  "authors": [
+    "TheInsanityGod"
+  ],
+  "description": "Every wanted your chute system to actually place the block instead of just dropping it? then this is the mod for you!",
+  "version": "1.0.0",
+  "dependencies": {
+    "game": ""
+  }
+}
