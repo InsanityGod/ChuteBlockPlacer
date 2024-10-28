@@ -5,7 +5,7 @@
   "authors": [
     "TheInsanityGod"
   ],
-  "description": "Every wanted your chute system to actually place the block instead of just dropping it? then this is the mod for you!",
+  "description": "A block placer, that connects to the chute system.",
   "version": "1.0.0",
   "dependencies": {
     "game": ""
