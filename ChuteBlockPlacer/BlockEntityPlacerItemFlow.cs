@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
@@ -25,12 +26,19 @@ namespace ChuteBlockPlacer
         private void InitInventory()
         {
             ParseBlockProperties();
-
-            inventory ??= new(QuantitySlots, null, null, null)
+            if (inventory != null) return;
+            inventory = new(QuantitySlots, null, null, null)
             {
                 OnGetAutoPushIntoSlot = GetAutoPushIntoSlot,
                 OnGetAutoPullFromSlot = GetAutoPullFromSlot
             };
+
+            inventory.SlotModified += OnSlotModifid;
+        }
+
+        private void OnSlotModifid(int slot)
+        {
+            Api.World.BlockAccessor.GetChunkAtBlockPos(Pos)?.MarkModified();
         }
 
         private ItemSlot GetAutoPullFromSlot(BlockFacing atBlockFace) => null;
@@ -181,9 +189,15 @@ namespace ChuteBlockPlacer
             }
         }
 
+        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
+        {
+            InitInventory();
+            base.FromTreeAttributes(tree, worldForResolving);
+        }
+
         public override bool OnPlayerRightClick(IPlayer byPlayer, BlockSelection blockSel)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }
