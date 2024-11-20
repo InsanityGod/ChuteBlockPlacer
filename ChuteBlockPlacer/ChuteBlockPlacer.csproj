@@ -37,15 +37,9 @@
   <Content Include="assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </Content>
-  <None Remove="assets\chuteblockplacer\blocktypes\chuteblockplacer.json" />
-  <None Remove="assets\chuteblockplacer\recipes\grid\chuteblockplacer.json" />
   <Content Include="modinfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </Content>
-</ItemGroup>
-
-<ItemGroup>
-  <Folder Include="assets\chuteblockplacer\compatibility\vanvar\" />
 </ItemGroup>
 
 </Project>

@@ -2,13 +2,35 @@
   "code": "chuteblockplacer",
   "class": "ChuteBlockPlacerBlock",
   "entityclass": "PlacerItemFlow",
+  "behaviors": [
+    {
+      "name": "VanillaVariants.BlockName",
+      "properties": {
+        "partsByType": {
+          "@.*-(uranium|platinum).*": [ "chuteblockplacer:block-chuteblockplacer", " (", "ore-{metal}", ")" ],
+          "*": [ "chuteblockplacer:block-chuteblockplacer", " (", "material-{metal}", ")" ]
+        }
+      }
+    }
+  ],
   "attributes": {
+    "handbook": { "groupBy": [ "chuteblockplacer-*" ] },
+    "configurableChute": true,
+    "configurableName": "chuteblockplacer",
+    "configurableType": "metal",
     "pullFaces": [],
     "acceptFromFaces": [ "up" ],
     "inventoryClassName": "chuteblockplacer",
     "quantitySlots": 1,
     "item-flowrate": 1
   },
+  "variantgroups": [
+    {
+      "code": "metal",
+      "loadFromProperties": "block/metal"
+    }
+  ],
+  "skipVariants": [ "*-copper" ],
   "creativeinventory": {
     "general": [ "*" ],
     "mechanics": [ "*" ]
@@ -20,7 +42,7 @@
   },
   "textures": {
     "all": {
-      "base": "game:block/metal/sheet/copper1"
+      "base": "game:block/metal/sheet/{metal}1"
     }
   },
   "sidesolid": {
