@@ -110,7 +110,6 @@ namespace ChuteBlockPlacer
 
         private bool TryPlace(ItemSlot slot, BlockPos pos)
         {
-            itemFlowAccum -= 1;
             string failureCode = null;
 
             var placed = slot.Itemstack.Block.TryPlaceBlock(Api.World, null, slot.Itemstack, new BlockSelection
@@ -121,6 +120,7 @@ namespace ChuteBlockPlacer
 
             if (placed)
             {
+                itemFlowAccum -= 1;
                 slot.TakeOut(1);
                 slot.MarkDirty();
                 MarkDirty(false, null);
