@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Vintagestory.API.Client;
@@ -121,6 +122,11 @@ namespace ChuteBlockPlacer
                     Api.Logger.Error($"TryPlace/TryFall failed due to the following exception: {e}");
                 }
             }
+            else if (firstItem.Itemstack.Item is ItemPileable pileableItem && pileableItem.IsPileable)
+            {
+                TryPlacePileableItem(firstItem, outputPos);
+                return;
+            }
 
             TrySpitOut(firstItem, outputPos);
         }
@@ -176,6 +182,68 @@ namespace ChuteBlockPlacer
                 MarkDirty(false, null);
             }
             return placed;
+        }
+
+        private bool TryPlacePileableItem(ItemSlot slot, BlockPos pos)
+        {
+            var IteratingPos = pos.Copy();
+            while (IteratingPos.Y > -1)
+            {
+                var nextBlock = Api.World.BlockAccessor.GetBlock(IteratingPos);
+                if (nextBlock.Id == 0)
+                {
+                    //Slowly traverse down if no block was found
+                    IteratingPos.Y--;
+                    continue;
+                }
+
+                //See if there already is a pile
+                var entity = Api.World.BlockAccessor.GetBlockEntity<BlockEntityItemPile>(IteratingPos);
+                if (entity != null)
+                {
+                    if (!slot.Itemstack.Equals(Api.World, entity.inventory[0].Itemstack, GlobalConstants.IgnoredStackAttributes))
+                    {
+                        //Throw item if it can't be added to the pile
+                        TrySpitOut(slot, pos);
+                        return false;
+                    }
+
+                    if (entity.MaxStackSize > entity.OwnStackSize)
+                    {
+                        //If pile isn't already full
+                        Api.World.PlaySoundAt(entity.SoundLocation, IteratingPos.X, IteratingPos.Y, IteratingPos.Z, null, 0.88f + (float)Api.World.Rand.NextDouble() * 0.24f, 16f, 1f);
+                        var itemSlot = entity.inventory[0];
+                        itemSlot.Itemstack.StackSize++;
+                        itemSlot.MarkDirty();
+                        entity.MarkDirty(false, null);
+
+                        slot.TakeOut(1);
+                        slot.MarkDirty();
+                        MarkDirty(false, null);
+                        return true;
+                    }
+                }
+
+                //Go up a block to make a new pile
+                IteratingPos.Y++;
+
+                //Ensure the new pile location is actually underneath the chute block placer
+                if (IteratingPos.Y > pos.Y) return false;
+
+                var pileableItem = slot.Itemstack.Item as ItemPileable;
+                var pileableItemTraverse = Traverse.Create(pileableItem);
+                var pileBlock = Api.World.GetBlock(pileableItemTraverse.Property("PileBlockCode").GetValue<AssetLocation>());
+                if (pileBlock != null)
+                {
+                    var success = ((IBlockItemPile)pileBlock).Construct(slot, Api.World, IteratingPos, null);
+                    MarkDirty(false, null);
+                    return success;
+                }
+                Api.Logger.Log(EnumLogType.Warning, $"Pileable item does not have a pileblock to put down? ({pileableItem.Code})");
+            }
+
+            TrySpitOut(slot, pos);
+            return false;
         }
 
         private bool TrySpitOut(ItemSlot slot, BlockPos pos)
