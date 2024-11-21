@@ -220,6 +220,8 @@ namespace ChuteBlockPlacer
                         slot.TakeOut(1);
                         slot.MarkDirty();
                         MarkDirty(false, null);
+
+                        if (entity is BlockEntityCoalPile coalPileEntity) Traverse.Create(coalPileEntity).Method("TriggerPileChanged").GetValue();
                         return true;
                     }
                 }
