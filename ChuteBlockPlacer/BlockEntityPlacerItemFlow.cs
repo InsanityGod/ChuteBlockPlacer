@@ -1,10 +1,13 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Common.Entities;
+using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
@@ -27,7 +30,7 @@ namespace ChuteBlockPlacer
         {
             ParseBlockProperties();
             if (inventory != null) return;
-            inventory = new(QuantitySlots, null, null, null)
+            inventory = new(QuantitySlots, null, null, OnNewSlot)
             {
                 OnGetAutoPushIntoSlot = GetAutoPushIntoSlot,
                 OnGetAutoPullFromSlot = GetAutoPullFromSlot
@@ -35,6 +38,11 @@ namespace ChuteBlockPlacer
 
             inventory.SlotModified += OnSlotModifid;
         }
+
+        private ItemSlot OnNewSlot(int id, InventoryGeneric inv) => new ItemSlotSurvival(inv)
+        {
+            MaxSlotStackSize = SlotStackSize
+        };
 
         private void OnSlotModifid(int slot)
         {
@@ -60,12 +68,14 @@ namespace ChuteBlockPlacer
                 checkRateMs = Block.Attributes["item-checkrateMs"].AsInt(checkRateMs);
                 inventoryClassName = Block.Attributes["inventoryClassName"].AsString(inventoryClassName);
                 QuantitySlots = Block.Attributes["quantitySlots"].AsInt(QuantitySlots);
+                SlotStackSize = Block.Attributes["slotStackSize"].AsInt(SlotStackSize);
             }
         }
 
         private float itemFlowRate = 0;
         private int checkRateMs = 200;
         private int QuantitySlots = 1;
+        private int SlotStackSize = 1;
 
         public override void Initialize(ICoreAPI api)
         {
@@ -96,16 +106,56 @@ namespace ChuteBlockPlacer
             {
                 try
                 {
-                    TryPlace(firstItem, outputPos);
+                    if (ChuteBlockPlacerModSystem.Config.CreateEntityBlockFalling && ((Api.World as IServerWorldAccessor).Api as ICoreServerAPI).Server.Config.AllowFallingBlocks)
+                    {
+                        TryFall(firstItem, outputPos);
+                    }
+                    else
+                    {
+                        TryPlace(firstItem, outputPos);
+                    }
                     return;
                 }
                 catch (Exception e)
                 {
-                    Api.Logger.Error($"Cannot place block due to the following exception: {e}");
+                    Api.Logger.Error($"TryPlace/TryFall failed due to the following exception: {e}");
                 }
             }
 
             TrySpitOut(firstItem, outputPos);
+        }
+
+        private bool TryFall(ItemSlot slot, BlockPos pos)
+        {
+            var blockAtTarget = Api.World.BlockAccessor.GetBlock(pos);
+            if (blockAtTarget.Replaceable <= 6000) return false;
+
+            AssetLocation fallSound = null;
+            float impactDamageMul = 1;
+            float dustIntensity = 0;
+
+            var unstableFallingBehaiour = slot.Itemstack.Block.GetBehavior<BlockBehaviorUnstableFalling>();
+            if (unstableFallingBehaiour != null)
+            {
+                var beh = Traverse.Create(unstableFallingBehaiour);
+
+                fallSound = beh.Field("fallSound").GetValue<AssetLocation>();
+                impactDamageMul = beh.Field("impactDamageMul").GetValue<float>();
+                dustIntensity = beh.Field("dustIntensity").GetValue<float>();
+            }
+
+            if (Api.World.GetNearestEntity(pos.ToVec3d().Add(0.5, 0.5, 0.5), 1f, 1.5f, (Entity e) => e is EntityBlockFalling entityBlockFalling && entityBlockFalling.initialPos.Equals(pos)) == null)
+            {
+                EntityBlockFalling entity = new(slot.Itemstack.Block, null, pos, fallSound, impactDamageMul, canFallSideways: true, dustIntensity);
+                Api.World.SpawnEntity(entity);
+
+                itemFlowAccum -= 1;
+                slot.TakeOut(1);
+                slot.MarkDirty();
+                MarkDirty(false, null);
+                return true;
+            }
+            return false;
         }
 
         private bool TryPlace(ItemSlot slot, BlockPos pos)
