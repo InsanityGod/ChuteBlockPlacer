@@ -2,26 +2,70 @@
   "code": "chuteblockplacer",
   "class": "ChuteBlockPlacerBlock",
   "entityclass": "PlacerItemFlow",
+  "behaviors": [
+    {
+      "name": "WrenchOrientable",
+      "properties": { "baseCode": "chute" }
+    }
+  ],
+  "variantgroups": [
+    {
+      "code": "metal",
+      "states": [ "copper" ]
+    },
+    {
+      "code": "orientation",
+      "states": [ "down" ],
+      "loadFromProperties": "abstract/horizontalorientation"
+    }
+  ],
   "attributes": {
     "pullFaces": [],
-    "acceptFromFaces": [ "up" ],
+    "acceptFromFacesByType": {
+      "*-down": [ "up" ],
+      "*-nort": [ "south" ],
+      "*-east": [ "west" ],
+      "*-south": [ "north" ],
+      "*-west": [ "east" ]
+    },
     "inventoryClassName": "chuteblockplacer",
     "quantitySlots": 1,
     "slotStackSize": 1,
     "item-flowrate": 1
   },
   "creativeinventory": {
-    "general": [ "*" ],
-    "mechanics": [ "*" ]
+    "general": [ "*-down" ],
+    "mechanics": [ "*-down" ]
   },
   "blockmaterial": "Metal",
-  "shape": {
-    "base": "game:block/metal/hopperh",
-    "rotateZ": 180
+  "shapeByType": {
+    "*-down": {
+      "base": "game:block/metal/hopperh",
+      "rotateZ": 180
+    },
+    "*-north": {
+      "base": "game:block/metal/hopperh",
+      "rotateZ": 90,
+      "rotateY": -90
+    },
+    "*-east": {
+      "base": "game:block/metal/hopperh",
+      "rotateZ": 90,
+      "rotateY": -180
+    },
+    "*-south": {
+      "base": "game:block/metal/hopperh",
+      "rotateZ": 90,
+      "rotateY": 90
+    },
+    "*-west": {
+      "base": "game:block/metal/hopperh",
+      "rotateZ": 90
+    }
   },
   "textures": {
     "all": {
-      "base": "game:block/metal/sheet/copper1"
+      "base": "game:block/metal/sheet/{metal}1"
     }
   },
   "sidesolid": {

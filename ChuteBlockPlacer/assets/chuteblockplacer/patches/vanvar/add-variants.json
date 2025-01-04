@@ -1,0 +1,33 @@
+[
+  {
+    "file": "blocktypes/chuteblockplacer.json",
+    "op": "addmerge",
+    "path": "/variantgroups/0/states",
+    "value": [ "bismuth", "bismuthbronze", "blackbronze", "brass", "chromium", "cupronickel", "electrum", "gold", "iron", "meteoriciron", "lead", "molybdochalkos", "platinum", "nickel", "silver", "stainlesssteel", "steel", "tin", "tinbronze", "titanium", "uranium", "zinc" ],
+    "dependsOn": [ { "modid": "vanvar" } ]
+  },
+  {
+    "file": "recipes/grid/chuteblockplacer.json",
+    "op": "addmerge",
+    "path": "/ingredients/I/allowedVariants",
+    "value": [ "bismuth", "bismuthbronze", "blackbronze", "brass", "chromium", "cupronickel", "electrum", "gold", "iron", "meteoriciron", "lead", "molybdochalkos", "platinum", "nickel", "silver", "stainlesssteel", "steel", "tin", "tinbronze", "titanium", "uranium", "zinc" ],
+    "dependsOn": [ { "modid": "vanvar" } ]
+  },
+  {
+    "file": "blocktypes/chuteblockplacer.json",
+    "op": "addmerge",
+    "path": "/behaviors",
+    "value": [
+      {
+        "name": "VanillaVariants.BlockName",
+        "properties": {
+          "partsByType": {
+            "@.*-(uranium|platinum).*": [ "chuteblockplacer:block-chuteblockplacer", " (", "ore-{metal}", ")" ],
+            "*": [ "chuteblockplacer:block-chuteblockplacer", " (", "material-{metal}", ")" ]
+          }
+        }
+      }
+    ],
+    "dependsOn": [ { "modid": "vanvar" } ]
+  }
+]

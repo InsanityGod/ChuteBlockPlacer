@@ -1,11 +1,6 @@
 ﻿using HarmonyLib;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
@@ -54,7 +49,9 @@ namespace ChuteBlockPlacer
 
         private ItemSlot GetAutoPushIntoSlot(BlockFacing atBlockFace, ItemSlot fromSlot)
         {
-            if (atBlockFace == BlockFacing.UP)
+            if (Block is not ChuteBlockPlacerBlock placerBlock) return null;
+
+            if (atBlockFace == placerBlock.Facing.Opposite)
             {
                 return inventory[0];
             }
@@ -101,7 +98,9 @@ namespace ChuteBlockPlacer
 
             if (itemFlowAccum < 1) return;
 
-            var outputPos = Pos.AddCopy(BlockFacing.DOWN);
+            if (Block is not ChuteBlockPlacerBlock placerBlock) return;
+
+            var outputPos = Pos.AddCopy(placerBlock.Facing);
 
             if (firstItem.Itemstack.Block != null && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || firstItem.Itemstack.Block.HasBehavior<BlockBehaviorUnstableFalling>()))
             {
@@ -265,26 +264,6 @@ namespace ChuteBlockPlacer
             MarkDirty(false, null);
 
             return true;
-        }
-
-        private bool TrySpitOut(BlockFacing outputFace)
-        {
-            if (this.Api.World.BlockAccessor.GetBlock(this.Pos.AddCopy(outputFace)).Replaceable >= 6000)
-            {
-                ItemSlot itemSlot = this.inventory.FirstOrDefault((ItemSlot slot) => !slot.Empty);
-                ItemStack stack = itemSlot.TakeOut((int)this.itemFlowAccum);
-                this.itemFlowAccum -= (float)stack.StackSize;
-                stack.Attributes.RemoveAttribute("chuteQHTravelled");
-                stack.Attributes.RemoveAttribute("chuteDir");
-                float velox = outputFace.Normalf.X / 10f + ((float)this.Api.World.Rand.NextDouble() / 20f - 0.05f) * (float)Math.Sign(outputFace.Normalf.X);
-                float veloy = outputFace.Normalf.Y / 10f + ((float)this.Api.World.Rand.NextDouble() / 20f - 0.05f) * (float)Math.Sign(outputFace.Normalf.Y);
-                float veloz = outputFace.Normalf.Z / 10f + ((float)this.Api.World.Rand.NextDouble() / 20f - 0.05f) * (float)Math.Sign(outputFace.Normalf.Z);
-                this.Api.World.SpawnItemEntity(stack, this.Pos.ToVec3d().Add(0.5 + (double)(outputFace.Normalf.X / 2f), 0.5 + (double)(outputFace.Normalf.Y / 2f), 0.5 + (double)(outputFace.Normalf.Z / 2f)), new Vec3d((double)velox, (double)veloy, (double)veloz));
-                itemSlot.MarkDirty();
-                this.MarkDirty(false, null);
-                return true;
-            }
-            return false;
         }
 
         public override void OnBlockRemoved()

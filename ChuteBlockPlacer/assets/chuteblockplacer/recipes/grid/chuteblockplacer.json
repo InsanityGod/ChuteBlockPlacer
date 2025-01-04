@@ -3,13 +3,15 @@
   "ingredients": {
     "I": {
       "type": "item",
-      "code": "game:metalplate-copper"
+      "code": "game:metalplate-*",
+      "name": "metal",
+      "allowedVariants": [ "copper" ]
     }
   },
   "width": 3,
   "height": 2,
   "output": {
     "type": "block",
-    "code": "chuteblockplacer"
+    "code": "chuteblockplacer-{metal}-down"
   }
 }
