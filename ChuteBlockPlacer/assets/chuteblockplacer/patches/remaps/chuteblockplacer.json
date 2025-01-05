@@ -1,0 +1,32 @@
+[
+  {
+    "file": "game:config/remaps.json",
+    "op": "addmerge",
+    "path": "/chuteblockplacer:1.0.1",
+    "value": [
+      "/bir remapq chuteblockplacer:chuteblockplacer-copper-down chuteblockplacer:chuteblockplacer force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-bismuth-down chuteblockplacer:chuteblockplacer-bismuth force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-bismuthbronze-down chuteblockplacer:chuteblockplacer-bismuthbronze force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-blackbronze-down chuteblockplacer:chuteblockplacer-blackbronze force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-brass-down chuteblockplacer:chuteblockplacer-brass force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-chromium-down chuteblockplacer:chuteblockplacer-chromium force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-cupronickel-down chuteblockplacer:chuteblockplacer-cupronickel force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-electrum-down chuteblockplacer:chuteblockplacer-electrum force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-gold-down chuteblockplacer:chuteblockplacer-gold force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-iron-down chuteblockplacer:chuteblockplacer-iron force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-meteoriciron-down chuteblockplacer:chuteblockplacer-meteoriciron force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-lead-down chuteblockplacer:chuteblockplacer-lead force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-molybdochalkos-down chuteblockplacer:chuteblockplacer-molybdochalkos force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-platinum-down chuteblockplacer:chuteblockplacer-platinum force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-nickel-down chuteblockplacer:chuteblockplacer-nickel force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-silver-down chuteblockplacer:chuteblockplacer-silver force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-stainlesssteel-down chuteblockplacer:chuteblockplacer-stainlesssteel force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-steel-down chuteblockplacer:chuteblockplacer-steel force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-tin-down chuteblockplacer:chuteblockplacer-tin force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-tinbronze-down chuteblockplacer:chuteblockplacer-tinbronze force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-titanium-down chuteblockplacer:chuteblockplacer-titanium force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-uranium-down chuteblockplacer:chuteblockplacer-uranium force",
+      "/bir remapq chuteblockplacer:chuteblockplacer-zinc-down chuteblockplacer:chuteblockplacer-zinc force"
+    ]
+  }
+]
