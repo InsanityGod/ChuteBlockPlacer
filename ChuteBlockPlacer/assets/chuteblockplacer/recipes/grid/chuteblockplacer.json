@@ -1,5 +1,5 @@
 {
-  "ingredientPattern": "_I_,I_I",
+  "ingredientPattern": "_I_,I_I,I_I",
   "ingredients": {
     "I": {
       "type": "item",
@@ -9,7 +9,7 @@
     }
   },
   "width": 3,
-  "height": 2,
+  "height": 3,
   "output": {
     "type": "block",
     "code": "chuteblockplacer-{metal}-down"
