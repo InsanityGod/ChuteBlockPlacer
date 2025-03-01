@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using ChuteBlockPlacer.Code.Blocks;
+using HarmonyLib;
 using System;
 using System.Linq;
 using Vintagestory.API.Common;
@@ -9,7 +10,7 @@ using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
-namespace ChuteBlockPlacer
+namespace ChuteBlockPlacer.Code.BlockEntities
 {
     public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
     {
@@ -101,18 +102,22 @@ namespace ChuteBlockPlacer
             if (Block is not ChuteBlockPlacerBlock placerBlock) return;
 
             var outputPos = Pos.AddCopy(placerBlock.Facing);
+            var isUnstableFalling = firstItem.Itemstack.Collectible.HasBehavior<BlockBehaviorUnstableFalling>();
 
-            if (firstItem.Itemstack.Block != null && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || firstItem.Itemstack.Block.HasBehavior<BlockBehaviorUnstableFalling>()))
+            if (firstItem.Itemstack.Block != null && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || isUnstableFalling))
             {
                 try
                 {
-                    if (ChuteBlockPlacerModSystem.Config.CreateEntityBlockFalling && ((Api.World as IServerWorldAccessor).Api as ICoreServerAPI).Server.Config.AllowFallingBlocks)
+                    var blockAtTarget = Api.World.BlockAccessor.GetBlock(outputPos);
+                    if (ChuteBlockPlacerModSystem.Config.CreateEntityBlockFalling
+                        && ((Api.World as IServerWorldAccessor).Api as ICoreServerAPI).Server.Config.AllowFallingBlocks
+                        && !isUnstableFalling)
                     {
-                        TryFall(firstItem, outputPos);
+                        TryFall(firstItem, outputPos, blockAtTarget);
                     }
                     else
                     {
-                        TryPlace(firstItem, outputPos);
+                        TryPlace(firstItem, outputPos, blockAtTarget);
                     }
                     return;
                 }
@@ -130,11 +135,13 @@ namespace ChuteBlockPlacer
             TrySpitOut(firstItem, outputPos);
         }
 
-        private bool TryFall(ItemSlot slot, BlockPos pos)
+        private bool TryFall(ItemSlot slot, BlockPos pos, Block blockAtTarget)
         {
-            var blockAtTarget = Api.World.BlockAccessor.GetBlock(pos);
-            if (blockAtTarget.Replaceable <= 6000) return false;
+            if (!blockAtTarget.IsReplacableBy(slot.Itemstack.Block)) return false; //Ensure we only drop if the block below can be replaced
 
+            var blockBelowTarget = Api.World.BlockAccessor.GetBlock(pos.DownCopy());
+            if (!blockBelowTarget.IsReplacableBy(slot.Itemstack.Block)) return TryPlace(slot, pos, blockAtTarget); //Ensure we place the block if the block below can support the block
+            
             AssetLocation fallSound = null;
             float impactDamageMul = 1;
             float dustIntensity = 0;
@@ -149,7 +156,7 @@ namespace ChuteBlockPlacer
                 dustIntensity = beh.Field("dustIntensity").GetValue<float>();
             }
 
-            if (Api.World.GetNearestEntity(pos.ToVec3d().Add(0.5, 0.5, 0.5), 1f, 1.5f, (Entity e) => e is EntityBlockFalling entityBlockFalling && entityBlockFalling.initialPos.Equals(pos)) == null)
+            if (Api.World.GetNearestEntity(pos.ToVec3d().Add(0.5, 0.5, 0.5), 1f, 1.5f, (e) => e is EntityBlockFalling entityBlockFalling && entityBlockFalling.initialPos.Equals(pos)) == null)
             {
                 EntityBlockFalling entity = new(slot.Itemstack.Block, null, pos, fallSound, impactDamageMul, canFallSideways: true, dustIntensity);
                 Api.World.SpawnEntity(entity);
@@ -163,10 +170,11 @@ namespace ChuteBlockPlacer
             return false;
         }
 
-        private bool TryPlace(ItemSlot slot, BlockPos pos)
+        private bool TryPlace(ItemSlot slot, BlockPos pos, Block blockAtTarget)
         {
-            string failureCode = null;
+            if(blockAtTarget.Code.FirstCodePart() == slot.Itemstack.Collectible.Code.FirstCodePart()) return false; //Prevent it from replacing itself with variants (like with pannable blocks)
 
+            string failureCode = null;
             var placed = slot.Itemstack.Block.TryPlaceBlock(Api.World, null, slot.Itemstack, new BlockSelection
             {
                 Position = pos,

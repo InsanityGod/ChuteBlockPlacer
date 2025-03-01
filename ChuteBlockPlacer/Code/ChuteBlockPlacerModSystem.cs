@@ -1,8 +1,10 @@
-﻿using ChuteBlockPlacer.Config;
+﻿using ChuteBlockPlacer.Code.BlockEntities;
+using ChuteBlockPlacer.Code.Blocks;
+using ChuteBlockPlacer.Config;
 using System;
 using Vintagestory.API.Common;
 
-namespace ChuteBlockPlacer
+namespace ChuteBlockPlacer.Code
 {
     public class ChuteBlockPlacerModSystem : ModSystem
     {
@@ -17,7 +19,7 @@ namespace ChuteBlockPlacer
 
             LoadConfig(api);
         }
-
+        //TODO EntityFalling.UpdateBlock
         private static void LoadConfig(ICoreAPI api)
         {
             try

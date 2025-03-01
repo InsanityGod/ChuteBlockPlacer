@@ -4,7 +4,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 
-namespace ChuteBlockPlacer
+namespace ChuteBlockPlacer.Code.Blocks
 {
     public class ChuteBlockPlacerBlock : Block, IBlockItemFlow
     {
@@ -39,10 +39,10 @@ namespace ChuteBlockPlacer
         public override ItemStack[] GetDrops(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
         {
             var block = world.GetBlock(new AssetLocation(CodeWithVariant("orientation", "down")));
-			return new ItemStack[]
-			{
-				new(block, 1)
-			};
+            return new ItemStack[]
+            {
+                new(block, 1)
+            };
         }
 
         public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos) => GetDrops(world, pos, null, 1f)[0];
