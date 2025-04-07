@@ -104,7 +104,11 @@ namespace ChuteBlockPlacer.Code.BlockEntities
             var outputPos = Pos.AddCopy(placerBlock.Facing);
             var isUnstableFalling = firstItem.Itemstack.Collectible.HasBehavior<BlockBehaviorUnstableFalling>();
 
-            if (firstItem.Itemstack.Block != null && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || isUnstableFalling))
+            if (firstItem.Itemstack.Collectible.HasBehavior<CollectibleBehaviorGroundStorable>())
+            {
+                //TODO maybe allow for placing ground storables at some point
+            }
+            else if (firstItem.Itemstack.Block != null && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || isUnstableFalling))
             {
                 try
                 {
