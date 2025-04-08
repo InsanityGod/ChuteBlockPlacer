@@ -1,0 +1,11 @@
+[
+  {
+    "file": "game:blocktypes/soil/peatbrick.json",
+    "op": "addmerge",
+    "path": "/behaviors/-",
+    "value": {
+      "name": "Unplaceable",
+      "__comment": "The ground storable obsoletes this being a block. Should be an item, but is kept a block for backwards compatibility"
+    }
+  }
+]
