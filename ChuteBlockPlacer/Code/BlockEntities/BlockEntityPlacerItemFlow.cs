@@ -3,7 +3,6 @@ using HarmonyLib;
 using System;
 using System.Linq;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
@@ -72,7 +71,7 @@ namespace ChuteBlockPlacer.Code.BlockEntities
         }
 
         private float itemFlowRate = 0;
-        private int checkRateMs = 200;
+        private int checkRateMs = 500;
         private int QuantitySlots = 1;
         private int SlotStackSize = 1;
 
@@ -102,13 +101,21 @@ namespace ChuteBlockPlacer.Code.BlockEntities
             if (Block is not ChuteBlockPlacerBlock placerBlock) return;
 
             var outputPos = Pos.AddCopy(placerBlock.Facing);
-            var isUnstableFalling = firstItem.Itemstack.Collectible.HasBehavior<BlockBehaviorUnstableFalling>();
-
-            if (firstItem.Itemstack.Block != null && !firstItem.Itemstack.Collectible.HasBehavior<BlockBehaviorUnplaceable>() && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || isUnstableFalling))
+            var itemStack = firstItem.Itemstack;
+            var isUnstableFalling = itemStack.Collectible.HasBehavior<BlockBehaviorUnstableFalling>();
+            
+            if (itemStack.Block is not null and not BlockBucket && !itemStack.Collectible.HasBehavior<BlockBehaviorUnplaceable>() && (!ChuteBlockPlacerModSystem.Config.UnstableFallingOnly || isUnstableFalling))
             {
                 try
                 {
                     var blockAtTarget = Api.World.BlockAccessor.GetBlock(outputPos);
+                    var targetUnstable = blockAtTarget?.GetBehavior<BlockBehaviorUnstableFalling>();
+                    if(targetUnstable is not null)
+                    {
+                        EnumHandling discard = 0;
+                        targetUnstable.OnNeighbourBlockChange(Api.World, outputPos, Pos, ref discard);
+                    }
+
                     if (ChuteBlockPlacerModSystem.Config.CreateEntityBlockFalling
                         && ((Api.World as IServerWorldAccessor).Api as ICoreServerAPI).Server.Config.AllowFallingBlocks
                         && !isUnstableFalling)
@@ -126,7 +133,7 @@ namespace ChuteBlockPlacer.Code.BlockEntities
                     Api.Logger.Error($"TryPlace/TryFall failed due to the following exception: {e}");
                 }
             }
-            else if (firstItem.Itemstack.Item is ItemPileable pileableItem && pileableItem.IsPileable)
+            else if (itemStack.Item is ItemPileable pileableItem && pileableItem.IsPileable)
             {
                 TryPlacePileableItem(firstItem, outputPos);
                 return;
