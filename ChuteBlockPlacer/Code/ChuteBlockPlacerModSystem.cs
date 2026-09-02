@@ -4,44 +4,43 @@ using ChuteBlockPlacer.Config;
 using System;
 using Vintagestory.API.Common;
 
-namespace ChuteBlockPlacer.Code
+namespace ChuteBlockPlacer.Code;
+
+public class ChuteBlockPlacerModSystem : ModSystem
 {
-    public class ChuteBlockPlacerModSystem : ModSystem
+    private const string ConfigName = "ChuteBlockPlacerConfig.json";
+
+    public static ModConfig Config { get; private set; }
+
+    public override void Start(ICoreAPI api)
     {
-        private const string ConfigName = "ChuteBlockPlacerConfig.json";
+        api.RegisterBlockClass("ChuteBlockPlacerBlock", typeof(ChuteBlockPlacerBlock));
+        api.RegisterBlockEntityClass("PlacerItemFlow", typeof(BlockEntityPlacerItemFlow));
 
-        public static ModConfig Config { get; private set; }
-
-        public override void Start(ICoreAPI api)
+        LoadConfig(api);
+    }
+    //TODO EntityFalling.UpdateBlock
+    private static void LoadConfig(ICoreAPI api)
+    {
+        try
         {
-            api.RegisterBlockClass("ChuteBlockPlacerBlock", typeof(ChuteBlockPlacerBlock));
-            api.RegisterBlockEntityClass("PlacerItemFlow", typeof(BlockEntityPlacerItemFlow));
-
-            LoadConfig(api);
-        }
-        //TODO EntityFalling.UpdateBlock
-        private static void LoadConfig(ICoreAPI api)
-        {
-            try
+            Config ??= api.LoadModConfig<ModConfig>(ConfigName);
+            if (Config == null)
             {
-                Config ??= api.LoadModConfig<ModConfig>(ConfigName);
-                if (Config == null)
-                {
-                    Config = new();
-                    api.StoreModConfig(Config, ConfigName);
-                }
-            }
-            catch (Exception ex)
-            {
-                api.Logger.Error(ex);
-                api.Logger.Warning("Failed to load config, using default values instead");
                 Config = new();
+                api.StoreModConfig(Config, ConfigName);
             }
         }
-
-        public override void Dispose()
+        catch (Exception ex)
         {
-            Config = null;
+            api.Logger.Error(ex);
+            api.Logger.Warning("Failed to load config, using default values instead");
+            Config = new();
         }
+    }
+
+    public override void Dispose()
+    {
+        Config = null;
     }
 }
