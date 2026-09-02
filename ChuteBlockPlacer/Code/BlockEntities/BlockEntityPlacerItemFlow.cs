@@ -1,5 +1,4 @@
 ﻿using ChuteBlockPlacer.Code.Blocks;
-using HarmonyLib;
 using System;
 using System.Linq;
 using Vintagestory.API.Common;
@@ -13,8 +12,11 @@ namespace ChuteBlockPlacer.Code.BlockEntities;
 
 public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
 {
-    public override AssetLocation OpenSound => new("game:sounds/block/hopperopen");
-    public override AssetLocation CloseSound => null;
+    public BlockEntityPlacerItemFlow()
+    {
+        OpenSound = new("game:sounds/block/hopperopen");
+        CloseSound = null;
+    }
 
     public override InventoryBase Inventory => inventory;
     private InventoryGeneric inventory;
@@ -156,11 +158,9 @@ public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
         var unstableFallingBehaiour = slot.Itemstack.Block.GetBehavior<BlockBehaviorUnstableFalling>();
         if (unstableFallingBehaiour != null)
         {
-            var beh = Traverse.Create(unstableFallingBehaiour);
-
-            fallSound = beh.Field("fallSound").GetValue<AssetLocation>();
-            impactDamageMul = beh.Field("impactDamageMul").GetValue<float>();
-            dustIntensity = beh.Field("dustIntensity").GetValue<float>();
+            fallSound = unstableFallingBehaiour.fallSound;
+            impactDamageMul = unstableFallingBehaiour.impactDamageMul;
+            dustIntensity = unstableFallingBehaiour.dustIntensity;
         }
 
         if (Api.World.GetNearestEntity(pos.ToVec3d().Add(0.5, 0.5, 0.5), 1f, 1.5f, (e) => e is EntityBlockFalling entityBlockFalling && entityBlockFalling.initialPos.Equals(pos)) == null)
@@ -235,7 +235,7 @@ public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
                     slot.MarkDirty();
                     MarkDirty(false, null);
 
-                    if (entity is BlockEntityCoalPile coalPileEntity) Traverse.Create(coalPileEntity).Method("TriggerPileChanged").GetValue();
+                    if (entity is BlockEntityCoalPile coalPileEntity) coalPileEntity.TriggerPileChanged();
                     return true;
                 }
             }
@@ -247,8 +247,7 @@ public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
             if (IteratingPos.Y > pos.Y) return false;
 
             var pileableItem = slot.Itemstack.Item as ItemPileable;
-            var pileableItemTraverse = Traverse.Create(pileableItem);
-            var pileBlock = Api.World.GetBlock(pileableItemTraverse.Property("PileBlockCode").GetValue<AssetLocation>());
+            var pileBlock = pileableItem.PileBlockCode;
             if (pileBlock != null)
             {
                 var success = ((IBlockItemPile)pileBlock).Construct(slot, Api.World, IteratingPos, null);
