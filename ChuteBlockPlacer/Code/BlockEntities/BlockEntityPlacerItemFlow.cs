@@ -14,8 +14,8 @@ public class BlockEntityPlacerItemFlow : BlockEntityOpenableContainer
 {
     public BlockEntityPlacerItemFlow()
     {
-        OpenSound = new("game:sounds/block/hopperopen");
-        CloseSound = null;
+        OpenSound = new("game:sounds/block/hopperopen", true);
+        CloseSound.Location = null;
     }
 
     public override InventoryBase Inventory => inventory;
